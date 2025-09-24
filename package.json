@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/Mahdi-0011/Slutprojekt-Node.js#readme",
   "dependencies": {
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "mysql2": "^3.15.0"
   }
 }
