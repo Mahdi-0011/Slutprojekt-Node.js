@@ -1,0 +1,25 @@
+{
+  "name": "slutprojekt-node",
+  "version": "1.0.0",
+  "description": "Repo för slutprojekt-Node.js.",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mahdi-0011/Slutprojekt-Node.js.git"
+  },
+  "keywords": [],
+  "author": "Mahdi Mousavi",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Mahdi-0011/Slutprojekt-Node.js/issues"
+  },
+  "homepage": "https://github.com/Mahdi-0011/Slutprojekt-Node.js#readme",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
