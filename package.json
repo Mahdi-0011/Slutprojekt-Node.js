@@ -1,5 +1,5 @@
 {
-  "name": "slutprojekt-node",
+  "name": "slutprojekt-node-js",
   "version": "1.0.0",
   "description": "Repo för slutprojekt-Node.js.",
   "main": "server.js",
@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/Mahdi-0011/Slutprojekt-Node.js#readme",
   "dependencies": {
+    "dotenv": "^17.2.2",
     "express": "^5.1.0",
     "mysql2": "^3.15.0"
   }
