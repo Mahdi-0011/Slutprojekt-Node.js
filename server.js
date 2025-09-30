@@ -1,73 +1,48 @@
-// server.js
-import express from 'express';
-import { connectDB } from './config/db.js';
+/** @format */
 
+import express from "express";
+import dotenv from "dotenv";
+import { BilverkstadDb, closeDB } from "./db/db_connect.js";
+
+// Importera alla routes
+import bilarRoutes from "./routes/bilarRoutes.js";
+import bilagareRoutes from "./routes/bilagareRoutes.js";
+import verkstadRoutes from "./routes/verkstadRoutes.js";
+import servisRoutes from "./routes/servisRoutes.js";
+import problemRoutes from "./routes/problemRoutes.js";
+
+dotenv.config();
 const app = express();
-const port = process.env.PORT || 3000;
-app.use(express.json()); // Tillåt JSON i requests
+const PORT = process.env.PORT || 3000;
 
-// GET /bilar
-// Hämta alla bilar från databasen
-// app.get('/bilar', async (req, res) => {
-//   try {
-//     const db = await connectDB();                    // Koppla till databasen
-//     const [rows] = await db.query('SELECT * FROM bilar'); // Hämta alla rader
-//     res.json(rows);                                  // Skicka tillbaka resultatet
-//     await db.end();                                  // Stäng anslutningen
-//   } catch (err) {
-//     res.status(500).json({ error: err.message });    // Felhantering
-//   }
-// });
+// Middleware för JSON
+app.use(express.json());
 
-//GET /servis-arende 
-// Hämta alla servisärenden från databasen
-app.get('/servis-arende', async (req, res) => {
-  try {
-    const db = await connectDB();                          
-    // Tabellen har namn med mellanslag, därför backticks
-    const [rows] = await db.query('SELECT * FROM `servis ärende`'); 
-    res.json(rows);                                  
-    await db.end();                                  
-  } catch (err) {
-    res.status(500).json({ error: err.message });    
-  }
-});
+// Koppla routes till API
+app.use("/api/bilar", bilarRoutes);
+app.use("/api/bilagare", bilagareRoutes);
+app.use("/api/verkstad", verkstadRoutes);
+app.use("/api/servis", servisRoutes);
+app.use("/api/bilproblem", problemRoutes);
 
-//Hämta servisarende med specifikt id
-app.get('/servis-arende/:id', async (req, res) => {
-  try {
-  const db = await connectDB();
-  const id = req.params.id; // Hämta id från URL:en
-  const [rows] = await db.query('SELECT * FROM `servis ärende` WHERE id = ?', [id]);
-  res.json(rows); // Skicka tillbaka resultatet
-  await db.end(); // Stäng anslutningen
-  } catch (err) {
-    res.status(500).json({ error: err.message });    
-  }
-});
+// Starta server
+async function start() {
+  await BilverkstadDb(); // Kontrollera DB-anslutning först
+  const server = app.listen(PORT, () => {
+    console.log(`Server körs på http://localhost:${PORT}`);
+  });
 
-// Hämta metadata för servisärende / antal bilar per ägare
-app.get('/metadata', async (req, res) => {
-  try {
-    const db = await connectDB();
+// graceful shutdown
+async function gracefulShutdown() {
+  console.log("Stänger ner server...");
+  server.close(async () => {
+    await closeDB(); // Stäng databasanslutning
+    console.log("Server nedstängd.");
+    process.exit(0);
+  });
+}
+  process.on("SIGINT", gracefulShutdown);
+  process.on("SIGTERM", gracefulShutdown);
+}
 
-    const query = `
-      SELECT \`bil ägare\`.\`förnamn\`, \`bil ägare\`.\`efternamn\`, COUNT(bilar.\`reg(pk)\`) AS antal_bilar
-      FROM \`bil ägare\`
-      LEFT JOIN bilar ON bilar.\`bil ägare id(fk)\` = \`bil ägare\`.id
-      GROUP BY \`bil ägare\`.id, \`bil ägare\`.\`förnamn\`, \`bil ägare\`.\`efternamn\`
-    `;
-
-    const [rows] = await db.query(query);
-
-    res.json(rows); // skicka tillbaka JSON
-    await db.end(); // stäng anslutning
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-
-
-// START SERVER
-app.listen(port, () => console.log(`Server körs på http://localhost:${port}`));
+start();
