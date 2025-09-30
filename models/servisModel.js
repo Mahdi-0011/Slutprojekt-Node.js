@@ -12,8 +12,15 @@ export async function getServisById(id) {
 
 // Hämtar meta-data för servisärende
 export async function getMetaServis() {
+  // const [rows] = await pool.query(`
+  // SELECT s.\`reg(fk)\`, s.\`inlämnad datum\`, s.\`hämtad datum\`FROM \`servis ärende\` AS s
+  // `);
   const [rows] = await pool.query(`
-  SELECT s.\`reg(fk)\`, s.\`inlämnad datum\`, s.\`hämtad datum\`FROM \`servis ärende\` AS s
+    SELECT
+      COUNT(*) AS total_servis,                     
+      MIN(\`inlämnad datum\`) AS första_inlämnad,  
+      MAX(\`hämtad datum\`) AS senaste_hämtad       
+    FROM \`servis ärende\`
   `);
   return rows;
 }
